@@ -13,11 +13,11 @@ if not api_key:
 client = Bytez(api_key)
 
 CHAT_MODEL = "openai/gpt-4o"
-IMAGE_MODEL = "openai/dall-e-2"
+IMAGE_MODEL = "google/imagen-4.0-ultra-generate-001"
 
-st.set_page_config(page_title="Bytez Chat + DALL·E", page_icon="🤖🎨", layout="wide")
+st.set_page_config(page_title="Chat + Image", page_icon="🤖🎨", layout="wide")
 st.title("🤖 Chat + 🎨 Image Generator")
-st.caption("GPT-4o chat and DALL·E-2 image generation in one app.")
+st.caption("Chat with GPT-4o and generate images using Google Imagen Ultra.")
 
 # -----------------------------
 # Tabs
@@ -63,33 +63,29 @@ with tab1:
 # Image Generation Tab
 # -----------------------------
 with tab2:
-    prompt = st.text_area("Enter a prompt for DALL·E-2:", "", key="image_prompt")
-    num_images = st.slider("Number of images", 1, 4, 1)
-    size = st.selectbox("Image size", ["256x256", "512x512", "1024x1024"])
+    prompt = st.text_area("Enter a prompt for Imagen Ultra:", "", key="image_prompt")
 
     if st.button("Generate Image(s)"):
         if not prompt.strip():
             st.warning("Please enter a prompt!")
         else:
             try:
+                # Load Imagen model
                 model = client.model(IMAGE_MODEL)
 
-                # Correct: prompt is a plain string
-                response = model.run(
-                    prompt,
-                    params={"n": num_images, "size": size}
-                )
+                # Run the model (single response object)
+                response = model.run(prompt)
+                output = response.output  # could be a string or a list
 
-                # Handle response: could be a string or list of strings
-                urls = response.output
-                if isinstance(urls, str):
-                    urls = [urls]  # convert single string to list
+                # Ensure we have a list of URLs
+                if isinstance(output, str):
+                    output = [output]
 
-                if not urls:
+                if not output:
                     st.error("⚠️ No images returned.")
                 else:
                     st.subheader("Generated Image(s)")
-                    for url in urls:
+                    for url in output:
                         if isinstance(url, str) and url.startswith("http"):
                             st.image(url)
                         else:
