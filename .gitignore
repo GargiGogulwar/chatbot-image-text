@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env/
+BYTEZ_API_KEY
+.streamlit/
+.DS_Store
+Thumbs.db
