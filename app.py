@@ -1,6 +1,7 @@
 ﻿import os
 import streamlit as st
 from bytez import Bytez
+import requests  # 👈 for downloading image bytes
 
 # -----------------------------
 # CONFIG
@@ -33,10 +34,12 @@ with tab1:
             {"role": "system", "content": "You are a helpful assistant."}
         ]
 
+    # Show chat history
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
+    # User input
     user_input = st.chat_input("Ask something...", key="chat_input")
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
@@ -85,9 +88,27 @@ with tab2:
                     st.error("⚠️ No images returned.")
                 else:
                     st.subheader("Generated Image(s)")
-                    for url in output:
+                    for idx, url in enumerate(output):
                         if isinstance(url, str) and url.startswith("http"):
-                            st.image(url)
+                            try:
+                                # Download image bytes
+                                resp = requests.get(url)
+                                resp.raise_for_status()
+                                img_bytes = resp.content
+
+                                # Show image
+                                st.image(img_bytes, caption=f"Image {idx + 1}")
+
+                                # Download button
+                                st.download_button(
+                                    label=f"⬇️ Download Image {idx + 1}",
+                                    data=img_bytes,
+                                    file_name=f"generated_image_{idx + 1}.png",
+                                    mime="image/png",
+                                    key=f"download_btn_{idx}",
+                                )
+                            except Exception as e:
+                                st.warning(f"Could not download image: {e}")
                         else:
                             st.warning(f"Invalid URL: {url}")
 
