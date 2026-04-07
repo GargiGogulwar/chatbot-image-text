@@ -1,3 +1,5 @@
+https://chatbot-image-text.streamlit.app/
+
 # 🤖 Bytez GPT-4o Chat + 🎨 DALL·E-2 Image Generator
 
 This is a Streamlit app that lets you chat with **GPT-4o** and generate images using **DALL·E-2**, all powered via the [Bytez API](https://bytez.ai). Your API key stays local and is never uploaded to any server.
